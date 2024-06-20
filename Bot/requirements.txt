@@ -1,0 +1,6 @@
+discord
+discord.ui
+aiomysql
+logging
+importlib
+dotenv
