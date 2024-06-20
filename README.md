@@ -104,7 +104,7 @@ Here are the available commands:
   - Check bot latency
   - Usage: `!ping`
   
-![alt text](img/ping.png)
+  ![alt text](img/ping.png)
 
 - **Command: add_user**
   - Add new user to database
@@ -138,7 +138,7 @@ Here are the available commands:
     - `!CleanUP all`
     - `!CleanUP score`
 
-![alt text](img/cleanup.png)
+    ![alt text](img/cleanup.png)
 
 - **Command: score**
   - Rank based on datetime
