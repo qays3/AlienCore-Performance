@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import json
 import importlib
 
-load_dotenv()
+load_dotenv("config.cfg")
 
 
 TOKEN = os.getenv('TOKEN')
@@ -20,14 +20,12 @@ AUTHORIZED_USER_IDS_str = os.getenv('AUTHORIZED_USER_IDS')
 
 AUTHORIZED_USER_IDS = json.loads(AUTHORIZED_USER_IDS_str) if AUTHORIZED_USER_IDS_str else []
 
-
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!", intents=intents)
 logging.basicConfig(level=logging.ERROR)
 
 
 bot.remove_command("help")
-
 
 async def create_connection():
     try:
