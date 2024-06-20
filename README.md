@@ -110,25 +110,39 @@ Here are the available commands:
   - Add new user to database
   - Usage: `!add_user <@member>`
 
+  ![alt text](img/adduser.png)
+  ![alt text](img/DM.png)
+  
 - **Command: AddTask**
   - Add a new task for a participant
   - Usage: `!AddTask <@member> <task_name> <weight> <deadline Format: 2024-06-20>`
+
+  ![alt text](img/addtask.png)
+
 
 - **Command: upload**
   - Upload task submission
   - Usage: `!upload <taskname>`
 
+  ![alt text](img/upload.png)
+
 - **Command: tasks**
   - List tasks for a participant
   - Usage: `!tasks <@member>`
+
+  ![alt text](img/tasks.png)
 
 - **Command: ann**
   - Add announcements to the server
   - Usage: `!ann <message>`
 
+  ![alt text](img/ann.png)
+
 - **Command: clear**
   - Clear messages in the channel
   - Usage: `!clear <number>`
+
+  ![alt text](img/clear.png)
 
 - **Command: CleanUP**
   - Clean Database tables
@@ -147,13 +161,19 @@ Here are the available commands:
     - `!score m <Rankings for Month>`
     - `!score y <Rankings for Year>`
 
+    ![alt text](img/score.png)
+
 - **Command: rank**
   - Display General Rank
   - Usage: `!rank`
 
+  ![alt text](img/rank.png)
+
 - **Command: help**
   - Display this help message
   - Usage: `!help`
+
+  ![alt text](img/help.png)
 
 ---
 
@@ -380,7 +400,8 @@ AlienCore-Performance
 │   ├── logo.png
 │   ├── mind.png
 ```
----
+ ---
+
 
 ## Credits
 
@@ -388,5 +409,3 @@ AlienCore-Performance
 
 ---
 
-
- 
