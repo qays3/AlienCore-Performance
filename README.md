@@ -353,13 +353,6 @@ Logging in the AlienCore Performance Score Bot is configured to track errors (`l
 This project is licensed under the [MIT License](LICENSE).
 
 ---
-
-## Credits
-
-- [qays3](https://github.com/qays3) - Creator of AlienCore Performance Score Bot
-
----
-
 ## Directory Structure
 
 ```
@@ -387,4 +380,13 @@ AlienCore-Performance
 │   ├── logo.png
 │   ├── mind.png
 ```
-![alt text](img/mind-1.png)
+---
+
+## Credits
+
+- [qays3](https://github.com/qays3) - Creator of AlienCore Performance Score Bot
+
+---
+
+
+ 
