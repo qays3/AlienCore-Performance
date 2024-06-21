@@ -60,13 +60,13 @@ AlienCore Performance Score Bot facilitates the management of performance scores
 ## Setting Up Environment Variables
 
 1. **Copy Environment Variables Template:**
-   - Copy the `.env.example` file to `.env`:
+   - Copy the `config.cfg.example` file to `config.cfg`:
      ```bash
-     cp .env.example .env
+     cp config.cfg.example config.cfg
      ```
 
-2. **Edit `.env` File:**
-   - Open the `.env` file using a text editor and update the following variables with your specific values:
+2. **Edit `config.cfg` File:**
+   - Open the `config.cfg` file using a text editor and update the following variables with your specific values:
      ```
      TOKEN=TOKEN_HERE
      TASK_CHANNEL_ID=TASK_CHANNEL_ID_HERE
@@ -379,8 +379,8 @@ This project is licensed under the [MIT License](LICENSE).
 AlienCore-Performance
 ├
 ├── bot
-│   ├── .env
-│   ├── .env.example
+│   ├── config.cfg
+│   ├── config.cfg.example
 │   ├── main.py
 │   ├── requirements.txt
 │   ├── commands
