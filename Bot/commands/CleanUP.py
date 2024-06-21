@@ -101,7 +101,7 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                                 embed = discord.Embed(description=f"**Participant {discord_user.mention} and all references have been deleted.**", color=discord.Color.green())
                                 await ctx.send(embed=embed)
                             else:
-                                embed = discord.Embed(description=f"**Participant with ID `{discord_id}` not found in database.**", color=discord.Color.red())
+                                embed = discord.Embed(description=f"**No participants found in the database.**", color=discord.Color.red())
                                 await ctx.send(embed=embed)
                         except ValueError:
                             embed = discord.Embed(description="**Invalid mention format. Use `@username` to specify the user.**", color=discord.Color.red())
