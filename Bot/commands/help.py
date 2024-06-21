@@ -14,7 +14,7 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
             ("tasks", "List tasks for a participant", "`!tasks <@member>`"),
             ("ann", "Add announcements to the server", "`!ann <message>`"),
             ("clear", "Clear messages in the channel", "`!clear <number>`"),
-            ("CleanUP", "Clean Database tables", "Use one of the following:\n`!CleanUP list`\n`!CleanUP table <TableName>`\n`!CleanUP all`\n`!CleanUP score`"),
+            ("CleanUP", "Clean Database tables", "Use one of the following:\n`!CleanUP list`\n`!CleanUP table <TableName>`\n`!CleanUP all`\n`!CleanUP score`\n`!CleanUP users list` and `!CleanUP users <@mention>` to delete a participant.\n`!CleanUP tasks` to list all tasks or delete a specific task with `!CleanUP tasks <taskname>`"),
             ("score", "Rank based on datetime", "Use one of the following:\n`!score w <Rankings for Week> `\n`!score m <Rankings for Month>`\n`!score y <Rankings for Year>`"),
             ("rank", "Display General Rank", "`!rank`"),
             ("help", "Display this help message", "`!help`")
