@@ -64,43 +64,58 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                         embed = discord.Embed(description=f"**Table `{table_name}` has reference keys and cannot be emptied.**", color=discord.Color.red())
                         await ctx.send(embed=embed)
 
-                elif subcommand.lower() == 'users' and participant_mention:
-                    try:
-                        if participant_mention.startswith('<@') and participant_mention.endswith('>'):
-                            participant_mention = participant_mention.strip('<@!>')
+                elif subcommand.lower() == 'users':
+                    if participant_mention and participant_mention.lower() == 'list':
+                        await cursor.execute("SELECT discord_id FROM Participants")
+                        participants = await cursor.fetchall()
 
-                        discord_id = int(participant_mention)
-
-                        discord_user = await bot.fetch_user(discord_id)
-
-                        await cursor.execute("SELECT id FROM Participants WHERE discord_id = %s", (discord_id,))
-                        participant = await cursor.fetchone()
-
-                        if participant:
-                            participant_id = participant['id']
-
-                            await cursor.execute("DELETE FROM Tasks WHERE participant_id = %s", (participant_id,))
-                            await cursor.execute("DELETE FROM Evaluations WHERE participant_id = %s", (participant_id,))
-                            await cursor.execute("DELETE FROM Submissions WHERE participant_id = %s", (participant_id,))
-
-                            await cursor.execute("DELETE FROM Participants WHERE id = %s", (participant_id,))
-                            await connection.commit()
-
-                            embed = discord.Embed(description=f"**Participant {discord_user.mention} and all references have been deleted.**", color=discord.Color.green())
+                        if participants:
+                            mention_list = "\n".join([f"<@{participant['discord_id']}>" for participant in participants])
+                            embed = discord.Embed(description=f"**Participants in Database:**\n{mention_list}", color=discord.Color.blue())
                             await ctx.send(embed=embed)
                         else:
-                            embed = discord.Embed(description=f"**This participant not exist**", color=discord.Color.red())
+                            embed = discord.Embed(description="**No participants found in the database.**", color=discord.Color.blue())
                             await ctx.send(embed=embed)
-                    except ValueError:
-                        embed = discord.Embed(description="**Invalid mention format. Use `@username` to specify the user.**", color=discord.Color.red())
+                    elif participant_mention:
+                        try:
+                            if participant_mention.startswith('<@') and participant_mention.endswith('>'):
+                                participant_mention = participant_mention.strip('<@!>')
+
+                            discord_id = int(participant_mention)
+
+                            discord_user = await bot.fetch_user(discord_id)
+
+                            await cursor.execute("SELECT id FROM Participants WHERE discord_id = %s", (discord_id,))
+                            participant = await cursor.fetchone()
+
+                            if participant:
+                                participant_id = participant['id']
+
+                                await cursor.execute("DELETE FROM Tasks WHERE participant_id = %s", (participant_id,))
+                                await cursor.execute("DELETE FROM Evaluations WHERE participant_id = %s", (participant_id,))
+                                await cursor.execute("DELETE FROM Submissions WHERE participant_id = %s", (participant_id,))
+
+                                await cursor.execute("DELETE FROM Participants WHERE id = %s", (participant_id,))
+                                await connection.commit()
+
+                                embed = discord.Embed(description=f"**Participant {discord_user.mention} and all references have been deleted.**", color=discord.Color.green())
+                                await ctx.send(embed=embed)
+                            else:
+                                embed = discord.Embed(description=f"**Participant with ID `{discord_id}` not found in database.**", color=discord.Color.red())
+                                await ctx.send(embed=embed)
+                        except ValueError:
+                            embed = discord.Embed(description="**Invalid mention format. Use `@username` to specify the user.**", color=discord.Color.red())
+                            await ctx.send(embed=embed)
+                        except aiomysql.Error as e:
+                            embed = discord.Embed(description=f"**Error deleting participant with ID `{discord_id}`: {str(e)}**", color=discord.Color.red())
+                            await ctx.send(embed=embed)
+                        except discord.HTTPException as e:
+                            embed = discord.Embed(description=f"**Error fetching user information for `{participant_mention}`: {str(e)}**", color=discord.Color.red())
+                            await ctx.send(embed=embed)
+                    else:
+                        embed = discord.Embed(description="**Invalid command. Use `!CleanUP users list` to list all participants or `!CleanUP users <@mention>` to delete a participant.**", color=discord.Color.red())
                         await ctx.send(embed=embed)
-                    except aiomysql.Error as e:
-                        embed = discord.Embed(description=f"**Error deleting participant with ID `{discord_id}`: {str(e)}**", color=discord.Color.red())
-                        await ctx.send(embed=embed)
-                    except discord.HTTPException as e:
-                        embed = discord.Embed(description=f"**Error fetching user information for `{participant_mention}`: {str(e)}**", color=discord.Color.red())
-                        await ctx.send(embed=embed)
-                
+
                 elif subcommand.lower() == 'tasks':
                     if not participant_mention:
                         await cursor.execute("SELECT task_name FROM Tasks")
@@ -114,7 +129,6 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                             await ctx.send(embed=embed)
                     else:
                         try:
-                            
                             await cursor.execute("SELECT id FROM Tasks WHERE task_name = %s", (participant_mention,))
                             task = await cursor.fetchone()
 
@@ -136,7 +150,7 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                             await ctx.send(embed=embed)
 
                 else:
-                    embed = discord.Embed(description="**Invalid command. Use one of the following:**\n`!CleanUP list`\n`!CleanUP table <TableName>`\n`!CleanUP all`\n`!CleanUP score`\n`!CleanUP users <@mention>` to delete a participant.\n`!CleanUP tasks` to list all tasks or delete a specific task with `!CleanUP tasks <taskname>`.", color=discord.Color.red())
+                    embed = discord.Embed(description="**Invalid command. Use one of the following:**\n`!CleanUP list`\n`!CleanUP table <TableName>`\n`!CleanUP all`\n`!CleanUP score`\n`!CleanUP users list` to list all participants or `!CleanUP users <@mention>` to delete a participant.\n`!CleanUP tasks` to list all tasks or delete a specific task with `!CleanUP tasks <taskname>`.", color=discord.Color.red())
                     await ctx.send(embed=embed)
 
         except aiomysql.Error as e:

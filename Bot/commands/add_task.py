@@ -29,8 +29,19 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
 
             async with connection.cursor() as cursor:
                 
-                sql_check_task = "SELECT id FROM Tasks WHERE task_name = %s AND participant_id = (SELECT id FROM Participants WHERE discord_id = %s)"
-                await cursor.execute(sql_check_task, (task_name, member.id))
+                
+                await cursor.execute("SELECT id FROM Participants WHERE discord_id = %s", (member.id,))
+                participant = await cursor.fetchone()
+
+                if not participant:
+                    message = f"The user {member.mention} is not registered in the system. Please register them first."
+                    embed = discord.Embed(description=message, color=0xFF0000)
+                    await ctx.send(embed=embed)
+                    return
+
+                
+                sql_check_task = "SELECT id FROM Tasks WHERE task_name = %s AND participant_id = %s"
+                await cursor.execute(sql_check_task, (task_name, participant['id']))
                 existing_task = await cursor.fetchone()
 
                 if existing_task:
@@ -40,8 +51,8 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                     return
 
                 
-                sql_insert_task = "INSERT INTO Tasks (task_name, weight, participant_id, deadline, created_at) VALUES (%s, %s, (SELECT id FROM Participants WHERE discord_id = %s), %s, NOW())"
-                await cursor.execute(sql_insert_task, (task_name, weight, member.id, deadline))
+                sql_insert_task = "INSERT INTO Tasks (task_name, weight, participant_id, deadline, created_at) VALUES (%s, %s, %s, %s, NOW())"
+                await cursor.execute(sql_insert_task, (task_name, weight, participant['id'], deadline))
                 await connection.commit()
 
                 deadline_date = datetime.strptime(deadline, "%Y-%m-%d").date()
@@ -50,7 +61,7 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
 
                 if days_until_deadline > 0:
                     decrease_per_day = weight / days_until_deadline
-                    score_message = f"Everyday will decrease the weight by {decrease_per_day:.2f} per day"
+                    score_message = f"Every day will decrease the weight by {decrease_per_day:.2f} per day"
 
                     task_details_message = f"New task added to AlienCore:\n" \
                                            f"Task Name: {task_name}\n" \
@@ -62,7 +73,6 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
 
                     embed_task_details = discord.Embed(description=task_details_message, color=0x000000)
 
-                    
                     button = discord.ui.Button(label="Delete Task", style=discord.ButtonStyle.secondary, custom_id=f"delete_{task_name}_{deadline}")
                     view = discord.ui.View()
                     view.add_item(button)
