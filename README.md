@@ -367,12 +367,6 @@ Logging in the AlienCore Performance Score Bot is configured to track errors (`l
 - **Troubleshooting**: Logged data assists in diagnosing issues, optimizing bot performance, and ensuring continuous operation.
 
 ---
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
 ## Directory Structure
 
 ```
@@ -401,6 +395,12 @@ AlienCore-Performance
 │   ├── mind.png
 ```
  ---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
 
 
 ## Credits
