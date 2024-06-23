@@ -148,6 +148,9 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                 await interaction.response.send_message("**You are not authorized to perform this action.**", ephemeral=True)
                 return
 
+            if interaction.response.is_done():
+                return
+
             if interaction.data['custom_id'].startswith("rejected_") or interaction.data['custom_id'].startswith("accepted_"):
                 action, submission_id = interaction.data['custom_id'].split('_')
                 connection = await create_connection()
@@ -155,6 +158,8 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                 if not connection:
                     await interaction.response.send_message("**Database connection failed.**", ephemeral=True)
                     return
+
+                await interaction.response.defer(ephemeral=True)
 
                 async with connection.cursor() as cursor:
                     sql_get_submission_status = "SELECT status, participant_id, task_id FROM Submissions WHERE id = %s"
@@ -172,7 +177,7 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                                 await cursor.execute(sql_update_submission, (submission_id,))
                                 await connection.commit()
                                 embed = discord.Embed(description="**Task has been rejected.**", color=0xFF0000)
-                                await interaction.response.send_message(embed=embed)
+                                await interaction.followup.send(embed=embed)
 
                             elif action == "accepted":
                                 sql_update_submission = "UPDATE Submissions SET status = 'accepted' WHERE id = %s"
@@ -230,7 +235,7 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                                         await participant.send(embed=embed)
 
                                     embed = discord.Embed(description="**Task has been accepted.**", color=0x00FF00)
-                                    await interaction.response.send_message(embed=embed)
+                                    await interaction.followup.send(embed=embed)
 
                             message = await interaction.channel.fetch_message(interaction.message.id)
                             view = await create_button_view(submission_id, connection)
@@ -238,19 +243,19 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
 
                         else:
                             embed = discord.Embed(description=f"**This task has already been {status}.**", color=0xFF0000)
-                            await interaction.response.send_message(embed=embed)
+                            await interaction.followup.send(embed=embed)
                     else:
                         embed = discord.Embed(description=f"**Submission with id {submission_id} not found.**", color=0xFF0000)
-                        await interaction.response.send_message(embed=embed)
+                        await interaction.followup.send(embed=embed)
 
         except aiomysql.Error as e:
             logging.error(f"Database error: {str(e)}")
             embed = discord.Embed(description=f"**Database error: {str(e)}**", color=0xFF0000)
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
         except Exception as e:
             logging.error(f"Unexpected error: {str(e)}")
             embed = discord.Embed(description=f"**Unexpected error: {str(e)}**", color=0xFF0000)
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
         finally:
             try:
                 if connection:
@@ -258,4 +263,4 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
             except Exception as e:
                 logging.error(f"Error closing the database connection: {str(e)}")
                 embed = discord.Embed(description=f"**Error closing the database connection: {str(e)}**", color=0xFF0000)
-                await interaction.response.send_message(embed=embed)
+                await interaction.followup.send(embed=embed)

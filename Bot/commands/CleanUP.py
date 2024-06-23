@@ -28,7 +28,7 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                 if subcommand.lower() == 'list':
                     await cursor.execute("SHOW TABLES")
                     tables = await cursor.fetchall()
-                    table_list = "\n".join([table['Tables_in_' + DB_DATABASE] for table in tables])
+                    table_list = "\n".join([table[f'Tables_in_{DB_DATABASE}'] for table in tables])
                     embed = discord.Embed(description=f"**Tables in Database:**\n{table_list}", color=discord.Color.purple())
                     await ctx.send(embed=embed)
 
@@ -37,7 +37,7 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                     await cursor.execute("SHOW TABLES")
                     tables = await cursor.fetchall()
                     for table in tables:
-                        await cursor.execute(f"TRUNCATE TABLE {table['Tables_in_' + DB_DATABASE]}")
+                        await cursor.execute(f"TRUNCATE TABLE {table[f'Tables_in_{DB_DATABASE}']}")
                     await cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
                     await connection.commit()
                     embed = discord.Embed(description="**All tables have been emptied.**", color=discord.Color.green())
@@ -91,10 +91,10 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                             if participant:
                                 participant_id = participant['id']
 
-                                await cursor.execute("DELETE FROM Tasks WHERE participant_id = %s", (participant_id,))
+                                # Delete entries in Evaluations, Submissions, and Tasks tables related to the participant
                                 await cursor.execute("DELETE FROM Evaluations WHERE participant_id = %s", (participant_id,))
                                 await cursor.execute("DELETE FROM Submissions WHERE participant_id = %s", (participant_id,))
-
+                                await cursor.execute("DELETE FROM Tasks WHERE participant_id = %s", (participant_id,))
                                 await cursor.execute("DELETE FROM Participants WHERE id = %s", (participant_id,))
                                 await connection.commit()
 
@@ -135,9 +135,9 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                             if task:
                                 task_id = task['id']
 
-                                await cursor.execute("DELETE FROM Tasks WHERE id = %s", (task_id,))
                                 await cursor.execute("DELETE FROM Evaluations WHERE task_id = %s", (task_id,))
                                 await cursor.execute("DELETE FROM Submissions WHERE task_id = %s", (task_id,))
+                                await cursor.execute("DELETE FROM Tasks WHERE id = %s", (task_id,))
                                 await connection.commit()
 
                                 embed = discord.Embed(description=f"**Task `{participant_mention}` and all references have been deleted.**", color=discord.Color.green())
