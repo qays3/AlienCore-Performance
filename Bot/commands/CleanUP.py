@@ -37,7 +37,8 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                     await cursor.execute("SHOW TABLES")
                     tables = await cursor.fetchall()
                     for table in tables:
-                        await cursor.execute(f"TRUNCATE TABLE {table[f'Tables_in_{DB_DATABASE}']}")
+                        table_name = table[f'Tables_in_{DB_DATABASE}']
+                        await cursor.execute("TRUNCATE TABLE %s", (table_name,))
                     await cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
                     await connection.commit()
                     embed = discord.Embed(description="**All tables have been emptied.**", color=discord.Color.green())
@@ -56,7 +57,7 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
 
                         table_name = participant_mention
 
-                        await cursor.execute(f"TRUNCATE TABLE {table_name}")
+                        await cursor.execute("TRUNCATE TABLE %s", (table_name,))
                         await connection.commit()
                         embed = discord.Embed(description=f"**Table `{table_name}` has been emptied.**", color=discord.Color.green())
                         await ctx.send(embed=embed)
@@ -91,7 +92,6 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                             if participant:
                                 participant_id = participant['id']
 
-                                # Delete entries in Evaluations, Submissions, and Tasks tables related to the participant
                                 await cursor.execute("DELETE FROM Evaluations WHERE participant_id = %s", (participant_id,))
                                 await cursor.execute("DELETE FROM Submissions WHERE participant_id = %s", (participant_id,))
                                 await cursor.execute("DELETE FROM Tasks WHERE participant_id = %s", (participant_id,))
