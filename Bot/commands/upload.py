@@ -200,20 +200,22 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                                     participant_discord_id = task_info['discord_id']
                                     task_name = task_info['task_name']
 
+                                    
                                     if created_at.tzinfo is None or created_at.tzinfo.utcoffset(created_at) is None:
                                         created_at = pytz.utc.localize(created_at)
                                     if deadline.tzinfo is None or deadline.tzinfo.utcoffset(deadline) is None:
                                         deadline = pytz.utc.localize(deadline)
 
-                                    days_total = (deadline - created_at).days
+                                    
                                     days_left = (deadline - datetime.now(pytz.utc)).days
-
-                                    if days_total == 0:
-                                        days_total = 1
-
-                                    decrease_score_per_day = weight / days_total
-                                    decrease_point = decrease_score_per_day * (days_total - days_left)
-                                    final_score = weight - decrease_point
+                                    
+                                    if days_left < 0:  
+                                        days_passed = abs(days_left)
+                                        decrease_score_per_day = weight / (deadline - created_at).days
+                                        decrease_point = decrease_score_per_day * days_passed
+                                        final_score = max(weight - decrease_point, 0)  
+                                    else:
+                                        final_score = weight  
 
                                     sql_insert_evaluation = "INSERT INTO Evaluations (participant_id, task_id, score, evaluated_at) VALUES (%s, %s, %s, NOW())"
                                     await cursor.execute(sql_insert_evaluation, (participant_id, task_id, final_score))
@@ -237,13 +239,13 @@ async def setup(bot, create_connection, AUTHORIZED_USER_IDS):
                                     embed = discord.Embed(description="**Task has been accepted.**", color=0x00FF00)
                                     await interaction.followup.send(embed=embed)
 
-                            message = await interaction.channel.fetch_message(interaction.message.id)
-                            view = await create_button_view(submission_id, connection)
-                            await message.edit(view=view)
+                                message = await interaction.channel.fetch_message(interaction.message.id)
+                                view = await create_button_view(submission_id, connection)
+                                await message.edit(view=view)
 
-                        else:
-                            embed = discord.Embed(description=f"**This task has already been {status}.**", color=0xFF0000)
-                            await interaction.followup.send(embed=embed)
+                            else:
+                                embed = discord.Embed(description=f"**This task has already been {status}.**", color=0xFF0000)
+                                await interaction.followup.send(embed=embed)
                     else:
                         embed = discord.Embed(description=f"**Submission with id {submission_id} not found.**", color=0xFF0000)
                         await interaction.followup.send(embed=embed)
