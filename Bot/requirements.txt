@@ -6,3 +6,4 @@ importlib
 dotenv
 pytz
 python-dotenv
+colorlog
